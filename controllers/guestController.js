@@ -1,11 +1,13 @@
 const express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
+const { userAuthMiddleware, guestAuthMiddleware } = require('../middlewares/auth');
 const Guests = mongoose.model('Guests');
+const Users = mongoose.model('Users');
 const Events = mongoose.model('Events');
 
 // Called when you open the guest list page
-router.get('/:eventId', async (req, res) => {
+router.get('/:eventId', userAuthMiddleware, async (req, res) => {
   try {
     const event = await Events.findById(req.params.eventId);
     const guests = await Guests.find({ event: req.params.eventId });
@@ -19,18 +21,18 @@ router.get('/:eventId', async (req, res) => {
   }
 });
 
-router.get('/:eventId/invite', async (req, res) => {
+router.get('/:eventId/invite', userAuthMiddleware, async (req, res) => {
   const eventId = req.params.eventId;
   const event = await Events.findById(eventId);
 
   res.render('guests/addOrEdit', {
     viewTitle: 'Insert Guests',
     eventId: eventId,
-    event
+    event,
   });
 });
 
-router.post('/:eventId', (req, res) => {
+router.post('/:eventId', userAuthMiddleware, (req, res) => {
   if (req.body._id == '') insertRecord(req, res);
   else updateRecord(req, res);
 });
@@ -60,7 +62,6 @@ function insertRecord(req, res) {
 function updateRecord(req, res) {
   Guests.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true }, (err, doc) => {
     if (!err) {
-      console.log('Guest updated', req.params.eventId);
       // Go back to the guest list page
       res.redirect(`../guests/${req.params.eventId}`);
     } else {
@@ -90,7 +91,7 @@ function handleValidationError(err, body) {
   }
 }
 
-router.get('/:eventId/details/:id', (req, res) => {
+router.get('/:eventId/details/:id', userAuthMiddleware, (req, res) => {
   Guests.findOne(
     {
       _id: req.params.id,
@@ -108,7 +109,7 @@ router.get('/:eventId/details/:id', (req, res) => {
   );
 });
 
-router.get('/:eventId/delete/:id', (req, res) => {
+router.get('/:eventId/delete/:id', userAuthMiddleware, (req, res) => {
   Guests.findOneAndRemove(
     {
       _id: req.params.id,
@@ -116,13 +117,42 @@ router.get('/:eventId/delete/:id', (req, res) => {
     },
     (err, doc) => {
       if (!err) {
-        console.log('Guest deleted', req.params.eventId);
         res.redirect(req.get('referer'));
       } else {
         console.log('Error in guest delete :' + err);
       }
     }
   );
+});
+
+const updateGuestRSVP = () => async (guestId, rsvp) => {
+  try {
+    // If guest's rsvp is 'yes', change it to 'no' and vice versa
+    const result = await Guests.findOneAndUpdate({ _id: guestId }, { rsvp }, { new: true });
+    return result;
+  } catch (error) {
+    console.log('Error in updating guest RSVP', error);
+  }
+};
+
+// guest home page. This is the page that the guest sees when he logs in
+// On this page, he can see the event details and can RSVP
+router.get('/home/rsvp', guestAuthMiddleware, async (req, res) => {
+  const event = await Events.findById(req.user.event);
+  const creator = await Users.findById(event.createdBy);
+  res.render('guests/home', {
+    event,
+    user: req.user,
+    creator,
+    updateGuestRSVP,
+  });
+});
+
+router.put('/rsvp', async (req, res) => {
+  const { rsvp, userId, eventId } = req.body;
+  const guest = await Guests.findOne({ _id: userId, event: eventId });
+  guest.rsvp = rsvp;
+  guest.save();
 });
 
 module.exports = router;

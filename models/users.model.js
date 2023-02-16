@@ -14,6 +14,10 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: 'This field is required.',
   },
+  role: {
+    type: String,
+    default: 'user',
+  },
   token: {
     type: String,
   },

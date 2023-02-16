@@ -1,20 +1,21 @@
 const express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
+const { userAuthMiddleware } = require('../middlewares/auth');
 const Events = mongoose.model('Events');
 const Guests = mongoose.model('Guests');
 
-router.get('/', (req, res) => {
+router.get('/', userAuthMiddleware, (req, res) => {
   res.render('events/addOrEdit', {
     viewTitle: 'Insert Events',
   });
 });
 // Details page
-router.get('/details/:id', (req, res) => {
+router.get('/details/:id', userAuthMiddleware, (req, res) => {
   getRecord(req, res);
 });
 
-router.post('/', (req, res) => {
+router.post('/', userAuthMiddleware, (req, res) => {
   if (req.body._id == '') insertRecord(req, res);
   else updateRecord(req, res);
 });
@@ -121,7 +122,7 @@ function updateRecord(req, res) {
   });
 }
 
-router.get('/list', async (req, res) => {
+router.get('/list', userAuthMiddleware, async (req, res) => {
   try {
     const events = await Events.find({ createdBy: req.user._id });
     res.render('events/list', { events });
@@ -145,7 +146,7 @@ function handleValidationError(err, body) {
   }
 }
 
-router.get('/:id', (req, res) => {
+router.get('/:id', userAuthMiddleware, (req, res) => {
   Events.findById(req.params.id, (err, doc) => {
     if (!err) {
       res.render('events/addOrEdit', {
@@ -156,7 +157,7 @@ router.get('/:id', (req, res) => {
   });
 });
 
-router.get('/delete/:id', (req, res) => {
+router.get('/delete/:id', userAuthMiddleware, (req, res) => {
   Events.findByIdAndRemove(req.params.id, (err, doc) => {
     if (!err) {
       res.redirect('/events/list');

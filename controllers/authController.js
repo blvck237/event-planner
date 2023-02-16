@@ -3,11 +3,10 @@ const mongoose = require('mongoose');
 
 const router = express.Router();
 const User = mongoose.model('Users');
+const Guests = mongoose.model('Guests');
 
 router.get('/', (req, res) => {
   // Check if user is logged in
-  console.log("Auth Mid", req.session);
-  
   if (req.session.userId) {
     res.redirect('/events/list');
     return;
@@ -31,6 +30,14 @@ router.get('/login', (req, res) => {
   });
 });
 
+router.get('/login-guest', (req, res) => {
+  res.render('auth/login-guest', {
+    user: {
+      email: 'sdm92i@92I.com',
+    },
+  });
+});
+
 router.get('/signup', (req, res) => {
   res.render('auth/signup', {
     viewTitle: 'Welcome to Event Planner',
@@ -46,6 +53,10 @@ router.post('/login', (req, res) => {
   login(req, res);
 });
 
+router.post('/login-guest', (req, res) => {
+  loginGuest(req, res);
+});
+
 router.post('/signup', (req, res) => {
   signUp(req, res);
 });
@@ -55,12 +66,12 @@ function signUp(req, res) {
   user.fullName = req.body.fullName;
   user.password = req.body.password;
   user.email = req.body.email;
+  user.role = 'user';
   user.save((err, doc) => {
     if (!err) {
       req.session.userId = doc._id;
       res.redirect('/');
       return;
-      res.redirect('events/list');
     } else {
       if (err.name == 'ValidationError') {
         handleValidationError(err, req.body);
@@ -71,6 +82,23 @@ function signUp(req, res) {
       } else console.log('Error during account creation : ' + err);
     }
   });
+}
+
+async function loginGuest(req, res) {
+  try {
+    let guest = await Guests.findOne({ email: req.body.email });
+    if (!guest) {
+      throw new Error('Guest not found');
+    }
+    guest = guest.toObject();
+    req.session.userId = guest._id;
+    req.session.role = 'guest';
+    req.app.set('guest', guest)
+    res.redirect('/guests/home/rsvp');
+    return guest;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function login(req, res) {
@@ -90,6 +118,7 @@ async function login(req, res) {
     await user.generateAuthToken();
     user = user.toObject();
     req.session.userId = user._id;
+    req.session.role = 'user';
     req.app.set('user', user)
     res.redirect('/events/list');
     return user;
