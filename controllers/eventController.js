@@ -8,6 +8,7 @@ const Guests = mongoose.model('Guests');
 router.get('/', userAuthMiddleware, (req, res) => {
   res.render('events/addOrEdit', {
     viewTitle: 'Insert Events',
+    user: req.user,
   });
 });
 // Details page
@@ -34,6 +35,7 @@ async function getRecord(req, res) {
       pendingGuests,
       totalGuests,
       refusedGuests,
+      user: req.user,
     });
   } catch (error) {
     console.log(error);
@@ -125,7 +127,7 @@ function updateRecord(req, res) {
 router.get('/list', userAuthMiddleware, async (req, res) => {
   try {
     const events = await Events.find({ createdBy: req.user._id });
-    res.render('events/list', { events });
+    res.render('events/list', { events, user: req.user });
   } catch (error) {
     console.log('Error in retrieving event list :' + err);
   }

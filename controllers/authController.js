@@ -49,6 +49,10 @@ router.get('/signup', (req, res) => {
   });
 });
 
+router.post('/logout', (req, res) => {
+  logout(req, res);
+});
+
 router.post('/login', (req, res) => {
   login(req, res);
 });
