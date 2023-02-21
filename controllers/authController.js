@@ -14,8 +14,8 @@ router.get('/', (req, res) => {
   res.render('auth/login', {
     viewTitle: 'Welcome to Event Planner',
     user: {
-      email: 'john@doe.com',
-      password: 'john@doe.com',
+      email: '',
+      password: '',
     },
   });
 });
@@ -24,8 +24,8 @@ router.get('/login', (req, res) => {
   res.render('auth/login', {
     viewTitle: 'Welcome to Event Planner',
     user: {
-      email: 'john@doe.com',
-      password: 'john@doe.com',
+      email: '',
+      password: '',
     },
   });
 });
@@ -33,7 +33,7 @@ router.get('/login', (req, res) => {
 router.get('/login-guest', (req, res) => {
   res.render('auth/login-guest', {
     user: {
-      email: 'sdm92i@92I.com',
+      email: '',
     },
   });
 });
