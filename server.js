@@ -12,8 +12,10 @@ const mongoose = require('mongoose');
 const guestController = require('./controllers/guestController');
 const authController = require('./controllers/authController');
 const eventController = require('./controllers/eventController');
+const { connect, seedDb } = require('./models/db');
+const Events = require('./models/events.model');
+const Guests = require('./models/guest.model');
 
-const Guests = mongoose.model('Guests');
 const app = express();
 
 // Set public folder
@@ -41,11 +43,14 @@ app.engine(
         return arg1 === arg2;
       },
       updateRSVP: function (rsvp, guestId, event) {
-        console.log('rsvp', rsvp);
-        Guests.findOneAndUpdate({ _id: guestId, event }, { rsvp }, { new: true });
+        Guests.findOneAndUpdate({ _id: guestId, event }, { rsvp });
       },
       stringify: function (obj) {
         return JSON.stringify(obj);
+      },
+      includes: function (arr, entry) {
+        let stringArray = arr.map((item) => item.toString());
+        return stringArray.includes(entry.toString());
       },
     },
   })
@@ -58,6 +63,17 @@ app.use('/events', eventController);
 app.use('/guests', guestController);
 
 // Start server
-app.listen(8000, () => {
-  console.log('Express server started at port : 8000');
-});
+
+async function startServer(port) {
+  try {
+    await connect();
+    await seedDb();
+    app.listen(port, () => {
+      console.log('Express server started at port', port);
+    });
+  } catch (error) {
+    console.log('Error starting server', error);
+  }
+}
+
+startServer(8000);

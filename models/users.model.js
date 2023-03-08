@@ -54,4 +54,6 @@ userSchema.methods.comparePassword = async function (requestPwd, pwd) {
   return pwdMatch;
 };
 
-mongoose.model('Users', userSchema);
+const Users = mongoose.model('Users', userSchema);
+
+module.exports = Users;

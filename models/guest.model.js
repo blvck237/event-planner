@@ -23,6 +23,10 @@ var guestSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Events',
   },
+  meals: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Meals',
+  },
 });
 
 // Custom validation for email
@@ -31,4 +35,6 @@ guestSchema.path('email').validate((val) => {
   return emailRegex.test(val);
 }, 'Invalid e-mail.');
 
-mongoose.model('Guests', guestSchema);
+const Guests = mongoose.model('Guests', guestSchema);
+
+module.exports = Guests;

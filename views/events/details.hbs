@@ -82,7 +82,177 @@
       </div>
 
     </div></div>
-  <div class='tab-pane fade' id='meals' role='tabpanel' aria-labelledby='meals-tab'>...</div>
+  <div class='tab-pane fade' id='meals' role='tabpanel' aria-labelledby='meals-tab'>
+    {{! Meal list }}
+    <div class='row mt-4'>
+      <div class='col-12'>
+
+        <div class='row mb-4'>
+          <div class='col-11'>
+            <h4>Starter</h4>
+          </div>
+        </div>
+
+        <table class='table table-striped-columns table-bordered table-hover table-fixed p-4'>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th scope='col'>Name</th>
+              <th scope='col'>Ingredients</th>
+              <th scope='col'>Selected</th>
+            </tr>
+          </thead>
+          <tbody class='table-group-divider'>
+            {{! loop on starter meals }}
+            {{#each meals.starterMeals}}
+              <tr>
+                <th scope="row">
+                  {{@index}}
+                </th>
+                <td>{{this.name}}</td>
+                <td>{{this.ingredients}}</td>
+                {{!-- Checkbox to select --}}
+                <td>
+                  <input
+                    type='checkbox'
+                    name='starter'
+                    value='{{../event._id}}-{{this._id}}'
+                    id="starter-{{this._id}}"
+                    {{#if (includes ../event.meals this._id) }}checked{{/if}}
+                  >
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      <div class='col-12'>
+
+        <div class='row mb-4'>
+          <div class='col-11'>
+            <h4>Main</h4>
+          </div>
+        </div>
+
+        <table class='table table-striped-columns table-bordered table-hover p-4'>
+                    <thead>
+            <tr>
+              <th>#</th>
+              <th scope='col'>Name</th>
+              <th scope='col'>Ingredients</th>
+              <th scope='col'>Selected</th>
+            </tr>
+          </thead>
+          <tbody class='table-group-divider'>
+            {{! loop on mainMeals meals }}
+            {{#each meals.mainMeals}}
+              <tr>
+                <th scope="row">
+                  {{@index}}
+                </th>
+                <td>{{this.name}}</td>
+                <td>{{this.ingredients}}</td>
+                <td>
+                  <input
+                    type='checkbox'
+                    name='main'
+                    value='{{../event._id}}-{{this._id}}'
+                    id="main-{{this._id}}"
+                    {{#if (includes ../event.meals this._id) }}checked{{/if}}
+                  >
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      <div class='col-12'>
+
+        <div class='row mb-4'>
+          <div class='col-11'>
+            <h4>Side</h4>
+          </div>
+        </div>
+
+        <table class='table table-striped-columns table-bordered table-hover p-4'>
+                    <thead>
+            <tr>
+              <th>#</th>
+              <th scope='col'>Name</th>
+              <th scope='col'>Ingredients</th>
+              <th scope='col'>Selected</th>
+            </tr>
+          </thead>
+          <tbody class='table-group-divider'>
+            {{! loop on Dessert meals }}
+            {{#each meals.sideMeals}}
+              <tr>
+                <th scope="row">
+                  {{@index}}
+                </th>
+                <td>{{this.name}}</td>
+                <td>{{this.ingredients}}</td>
+                <td>
+                  <input
+                    type='checkbox'
+                    name='dessert'
+                    value='{{../event._id}}-{{this._id}}'
+                    id="dessert-{{this._id}}"
+                    {{#if (includes ../event.meals this._id) }}checked{{/if}}
+                  >
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      <div class='col-12'>
+
+        <div class='row mb-4'>
+          <div class='col-11'>
+            <h4>Dessert</h4>
+          </div>
+        </div>
+
+        <table class='table table-striped-columns table-bordered table-hover p-4'>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th scope='col'>Name</th>
+              <th scope='col'>Ingredients</th>
+              <th scope='col'>Selected</th>
+            </tr>
+          </thead>
+          <tbody class='table-group-divider'>
+            {{! loop on dessertMeals meals }}
+            {{#each meals.dessertMeals}}
+              <tr>
+                <th scope="row">
+                  {{@index}}
+                </th>
+                <td>{{this.name}}</td>
+                <td>{{this.ingredients}}</td>
+                <td>
+                  <input
+                    type='checkbox'
+                    name='side'
+                    value='{{../event._id}}-{{this._id}}'
+                    id="side-{{this._id}}"
+                    {{#if (includes ../event.meals this._id) }}checked{{/if}}
+                  >
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
   <div class='tab-pane fade' id='guests' role='tabpanel' aria-labelledby='guests-tab'>
     {{! Guest list }}
     <div class='row mt-4'>
@@ -121,5 +291,9 @@
         </table>
       </div>
 
-    </div></div>
+    </div>
+
+  </div>
 </div>
+
+<script src='/meal-action.js'></script>

@@ -1,16 +1,17 @@
 const express = require('express');
 var router = express.Router();
-const mongoose = require('mongoose');
 const { userAuthMiddleware, guestAuthMiddleware } = require('../middlewares/auth');
-const Guests = mongoose.model('Guests');
-const Users = mongoose.model('Users');
-const Events = mongoose.model('Events');
+const Guests = require('../models/guest.model');
+const Users = require('../models/users.model');
+const Events = require('../models/events.model');
+const Meals = require('../models/meals.model');
 
 // Called when you open the guest list page
 router.get('/:eventId', userAuthMiddleware, async (req, res) => {
   try {
     const event = await Events.findById(req.params.eventId);
     const guests = await Guests.find({ event: req.params.eventId });
+
     res.render('guests/list', {
       list: guests,
       eventId: req.params.eventId,
@@ -140,11 +141,36 @@ const updateGuestRSVP = () => async (guestId, rsvp) => {
 router.get('/home/rsvp', guestAuthMiddleware, async (req, res) => {
   const event = await Events.findById(req.user.event);
   const creator = await Users.findById(event.createdBy);
+  const starterMeals = await Meals.find({
+    _id: { $in: event.meals },
+    category: 'starter',
+  });
+  const mainMeals = await Meals.find({
+    _id: { $in: event.meals },
+    category: 'main',
+  });
+  const dessertMeals = await Meals.find({
+    _id: { $in: event.meals },
+    category: 'dessert',
+  });
+  const sideMeals = await Meals.find({
+    _id: { $in: event.meals },
+    category: 'side',
+  });
+
+  const meals = {
+    starterMeals,
+    mainMeals,
+    dessertMeals,
+    sideMeals,
+  };
+  console.log(req.user);
   res.render('guests/home', {
     event,
     user: req.user,
     creator,
     updateGuestRSVP,
+    meals,
   });
 });
 
@@ -152,7 +178,23 @@ router.put('/rsvp', async (req, res) => {
   const { rsvp, userId, eventId } = req.body;
   const guest = await Guests.findOne({ _id: userId, event: eventId });
   guest.rsvp = rsvp;
-  guest.save();
+  await guest.save();
+  res.json({ success: true });
+});
+
+router.put('/:eventId/meals', guestAuthMiddleware, async (req, res) => {
+  const { eventId } = req.params;
+  console.log(req.body, guestAuthMiddleware, eventId);
+  const { meal } = req.body;
+  const { user} = req;
+  const index = user.meals.indexOf(meal);
+  if (index > -1) {
+    user.meals.splice(index, 1);
+  } else {
+    user.meals.push(meal);
+  }
+  await user.save();
+  res.json({ success: true });
 });
 
 module.exports = router;

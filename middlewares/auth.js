@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Users = mongoose.model('Users');
-const Guests = mongoose.model('Guests');
+const Users = require('../models/users.model');
+const Guests = require('../models/guest.model');
 
 const userAuthMiddleware = async (req, res, next) => {
   // log route
