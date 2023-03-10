@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const router = express.Router();
-const User = mongoose.model('Users');
-const Guests = mongoose.model('Guests');
+const User = require('../models/users.model');
+const Guests = require('../models/guest.model');
 
 router.get('/', (req, res) => {
   // Check if user is logged in

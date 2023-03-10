@@ -1,6 +1,6 @@
 <nav aria-label='breadcrumb'>
   <ol class='breadcrumb'>
-    <li class='breadcrumb-item'><a href='javascript:history.back()'>Events</a></li>
+    <li class='breadcrumb-item'><a href='javascript:location.href="/events/list"'>Events</a></li>
     <li class='breadcrumb-item'><a href='javascript:history.back()'>{{event.name}}</a></li>
     <li class='breadcrumb-item active' aria-current='page'>Guests</li>
   </ol>
@@ -25,6 +25,7 @@
       <th scope='col'>Email</th>
       <th scope='col'>Mobile</th>
       <th scope='col'>City</th>
+      <th scope='col'>Meals</th>
       <th scope='col'>RSVP</th>
       <th scope='col'></th>
     </tr>
@@ -36,6 +37,13 @@
         <td>{{this.email}}</td>
         <td>{{this.mobile}}</td>
         <td>{{this.city}}</td>
+        <td>
+          <ul>
+            <li><b>Starter: </b><i>{{this.starterMeals}}</i></li>
+            <li><b>Main: </b><i>{{this.mainMeals}}</i></li>
+            <li><b>Dessert: </b><i>{{this.dessertMeals}}</i></li>
+          </ul>
+        </td>
         <td>{{this.rsvp}}</td>
         <td>
           <a href='/guests/{{this.event}}/details/{{this._id}}'><i class='bi-pencil text-success m-1'></i></a>

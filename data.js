@@ -78,6 +78,13 @@ const meals = [
     image: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/0A475B34-4E78-40D8-9F30-46223B7D77E7/Derivates/E55C7EA4-0E60-403F-B5DC-75EA358197BD.jpg',
     category: 'dessert',
     value: 'chocolate-cake',
+  },
+  {
+    name: 'Cheesecake',
+    ingredients: 'cream cheese, sugar, eggs, flour, butter, lemon juice, salt',
+    category: 'dessert',
+    value: 'cheesecake',
+    image: ''
   }
 ];
 

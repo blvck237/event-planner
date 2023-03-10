@@ -10,15 +10,34 @@ const Meals = require('../models/meals.model');
 router.get('/:eventId', userAuthMiddleware, async (req, res) => {
   try {
     const event = await Events.findById(req.params.eventId);
-    const guests = await Guests.find({ event: req.params.eventId });
+    const guests = await Guests.find({ event: req.params.eventId })
+      .populate({
+        path: 'meals',
+        model: 'Meals',
+      })
+      .lean();
+
+    const guestList = guests.map((guest) => {
+      const starterMeals = guest.meals.filter((meal) => meal.category === 'starter').map(m => m.name).join(', ');
+      const mainMeals = guest.meals.filter((meal) => meal.category === 'main').map(m => m.name).join(', ');
+      const dessertMeals = guest.meals.filter((meal) => meal.category === 'dessert').map(m => m.name).join(', ');
+      return {
+        ...guest,
+        starterMeals,
+        mainMeals,
+        dessertMeals,
+        // Capitalize the first letter of the rsvp
+        rsvp: guest.rsvp.charAt(0).toUpperCase() + guest.rsvp.slice(1),
+      };
+    });
 
     res.render('guests/list', {
-      list: guests,
+      list: guestList,
       eventId: req.params.eventId,
       event,
     });
   } catch (error) {
-    console.log('Error in retrieving guest list :' + err);
+    console.log('Error in retrieving guest list :' + error);
   }
 });
 
@@ -186,7 +205,7 @@ router.put('/:eventId/meals', guestAuthMiddleware, async (req, res) => {
   const { eventId } = req.params;
   console.log(req.body, guestAuthMiddleware, eventId);
   const { meal } = req.body;
-  const { user} = req;
+  const { user } = req;
   const index = user.meals.indexOf(meal);
   if (index > -1) {
     user.meals.splice(index, 1);
